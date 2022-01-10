@@ -1,7 +1,5 @@
 import { getDatabase, ref, set } from "firebase/database";
 import { initializeApp } from "firebase/app";
-import { TrygetToken } from "./firebaseInit";
-import React, { useState, useEffect } from "react";
 
 const firebaseApp = initializeApp({
     apiKey: "AIzaSyDde0B7StUzhKnDnudJuM4dzpyoSWsz81A",
@@ -14,7 +12,7 @@ const firebaseApp = initializeApp({
 });
 const database = getDatabase(firebaseApp);
 
-const writeUserToken = (token) => {
+export const writeUserToken = (token) => {
     set(ref(database, "users/user1"), {
         token: token,
     });
@@ -24,24 +22,4 @@ export const updateCount = (count) => {
     set(ref(database, "click/"), {
         clicks: count + 1,
     });
-};
-
-export const Notifications = () => {
-    const [isTokenFound, setTokenFound] = useState(false);
-    console.log("Token found", isTokenFound);
-    // To load once
-    useEffect(() => {
-        let data;
-        async function tokenFunc() {
-            data = await TrygetToken(setTokenFound);
-            if (data) {
-                console.log("Token is", data);
-                writeUserToken(data);
-            }
-            return data;
-        }
-        tokenFunc();
-    }, [setTokenFound]);
-
-    return <></>;
 };

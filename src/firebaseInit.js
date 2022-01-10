@@ -1,5 +1,6 @@
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 import { initializeApp } from "firebase/app";
+import { writeUserToken } from "./firebasedb";
 
 const firebaseApp = initializeApp({
     apiKey: "AIzaSyDde0B7StUzhKnDnudJuM4dzpyoSWsz81A",
@@ -15,20 +16,28 @@ const messaging = getMessaging(firebaseApp);
 const { REACT_APP_VAPID_KEY } = process.env;
 const publicKey = REACT_APP_VAPID_KEY;
 
-export const TrygetToken = async (setTokenFound) => {
+export const tryGetToken = () => {
     let currentToken = "";
     try {
-        currentToken = await getToken(messaging, { vapidKey: publicKey });
-        if (currentToken) {
-            setTokenFound(true);
-        } else {
-            setTokenFound(false);
-        }
+        Notification.requestPermission()
+            .then((permission) => {
+                console.log("Permission", permission);
+                if (permission === "granted") {
+                    getToken(messaging, { vapidKey: publicKey }).then((currentToken) => {
+                        console.log("Token genrated: ", currentToken);
+                        writeUserToken(currentToken);
+                    });
+                }
+            })
+            .catch((e) => {
+                console.log(e);
+            });
     } catch (error) {
         console.log("An error occurred while retrieving token. ", error);
     }
     return currentToken;
 };
+export const token = tryGetToken();
 
 export const onMessageListener = () =>
     new Promise((resolve) => {

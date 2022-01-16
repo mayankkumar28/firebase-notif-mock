@@ -1,4 +1,4 @@
-import { getDatabase, ref, set } from "firebase/database";
+import { getDatabase, ref, set, onValue } from "firebase/database";
 import { initializeApp } from "firebase/app";
 
 const firebaseApp = initializeApp({
@@ -22,4 +22,14 @@ export const updateCount = (count) => {
     set(ref(database, "click/"), {
         clicks: count + 1,
     });
+};
+
+export const getCurrentToken = () => {
+    const starCountRef = ref(database, "/users/user1/token");
+    let data = "";
+    onValue(starCountRef, (snapshot) => {
+        data = snapshot.val();
+    });
+    console.log("New token:", data);
+    return data;
 };

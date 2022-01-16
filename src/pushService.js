@@ -1,12 +1,12 @@
-import { token } from "./firebaseInit";
+import { getCurrentToken } from "./firebasedb";
 
-const { SERVER_KEY } = process.env;
-const ServerKey = SERVER_KEY;
-
-export const sendNotification = () => {
-    const mytoken = token;
+export const sendNotification = async (notification_type) => {
+    const mytoken = getCurrentToken();
     const title = "Hello world";
-    const msg = "This is your notification";
+    const msg =
+        notification_type === "front"
+            ? "This is your Foreground notification"
+            : "This is your Push (background) notification";
     let body = {
         to: mytoken,
         notification: {
@@ -15,17 +15,16 @@ export const sendNotification = () => {
             image: "../public/logo192.png",
         },
     };
-
     const options = {
         method: "POST",
         headers: new Headers({
-            Authorization: ServerKey,
+            Authorization: process.env.REACT_APP_SERVER_KEY,
             "Content-Type": "application/json",
         }),
         body: JSON.stringify(body),
     };
 
-    fetch("https://fcm.googleapis.com/fcm/send", options)
+    await fetch("https://fcm.googleapis.com/fcm/send", options)
         .then((res) => res.json())
         .then((data) => {
             console.log(data);

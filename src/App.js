@@ -1,9 +1,10 @@
 import { onMessageListener } from "./firebaseInit";
 import { tryGetToken } from "./firebaseInit";
 import { updateCount } from "./firebasedb";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { sendNotification } from "./pushService";
 import ToastComponent from "./toastNotification";
+import * as workerTimers from "worker-timers";
 
 function App() {
     const [count, setCount] = useState(0);
@@ -23,15 +24,32 @@ function App() {
     function handleClick() {
         setCount(count + 1);
         updateCount(count);
-        sendNotification();
+        sendNotification("front");
     }
-    tryGetToken();
+    function handleBackgroundClick() {
+        window.open("", "_blank");
+        sendNotification("back");
+        workerTimers.setTimeout(() => {
+            sendNotification("back");
+        }, 500);
+    }
 
+    tryGetToken();
     return (
         <div className="App">
-            <h1>Push Notification service</h1>
-            <button onClick={tryGetToken}>Give Permission</button>
-            <button onClick={handleClick}>Send Notification</button>
+            <center>
+                <h1>Push Notification service</h1>
+                <button onClick={tryGetToken}>Give Permission</button>
+                <span> </span>
+                <button onClick={handleClick}>Send Foreground Notification</button>
+                <span> </span>
+                <button onClick={handleBackgroundClick}>Send Push (Background) Notification</button>
+                <h3>
+                    Note: A new tab will automatically open to recieve push notification in
+                    background. <br></br> It will show up after 1 second.
+                    <br></br> Push Notifications works even if you close the website.
+                </h3>
+            </center>
             {show ? <ToastComponent title={notification.title} body={notification.body} /> : <></>}
         </div>
     );

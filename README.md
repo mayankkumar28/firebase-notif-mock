@@ -1,6 +1,6 @@
 # Web push notification system using Firebase
 
-The project has been deployed to the below websites. You can test this project at :
+The project has been deployed to the following website. You can test this at :
 https://firebasenotif.netlify.app/ 
 
 ## Please allow notifications permissions in your browser to work
